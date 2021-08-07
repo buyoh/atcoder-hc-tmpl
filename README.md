@@ -1,3 +1,11 @@
+# ((repository name))
+
+((problem URL))
+
+((ranking)) 位
+
+generated from https://github.com/buyoh/atcoder-hc-tmpl
+
 # mmworkspace
 
 workspace for heuristic contest
