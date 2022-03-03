@@ -25,9 +25,9 @@ TOTAL_SCORE=0
 
 for FILE in `ls out/cases`; do
   FILE_STDOUT="out/cases_out/$FILE" # but STDERR!
-  SCORE=`tail $FILE_STDOUT -n1`
+  SCORE=`tail $FILE_STDOUT -n1 | tr -cd "^0-9"`
   echo "case '$FILE': score=$SCORE"
   TOTAL_SCORE=$(($TOTAL_SCORE+$SCORE))
 done
 # echo "total score:"
-echo $TOTAL_SCORE
+printf "%.4e" $TOTAL_SCORE
