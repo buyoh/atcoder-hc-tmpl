@@ -1,6 +1,7 @@
-#pragma GCC optimize ("O3")
+#pragma GCC optimize("O3")
 #include <bits/stdc++.h>
 
+// clang-format off
 using namespace std;
 using ll = long long int;
 
@@ -8,8 +9,9 @@ using ll = long long int;
 #define repeat(cnt,l) for(typename remove_const<typename remove_reference<decltype(l)>::type>::type cnt={};(cnt)<(l);++(cnt))
 #define rrepeat(cnt,l) for(auto cnt=(l)-1;0<=(cnt);--(cnt))
 #define iterate(cnt,b,e) for(auto cnt=(b);(cnt)!=(e);++(cnt))
-#define diterate(cnt,b,e) for(auto cnt=(b);(cnt)!=(e);--(cnt))
-const long long MD = 1000000007ll; const long double PI = 3.1415926535897932384626433832795L;
+#define upto(cnt,b,e,step) for(auto cnt=(b);(cnt)<=(e);(cnt)+=(step))
+#define downto(cnt,b,e,step) for(auto cnt=(b);(e)<=(cnt);(cnt)-=(step))
+const long long MD = 998244353; const long double PI = 3.1415926535897932384626433832795L;
 template<typename T1, typename T2> inline ostream& operator <<(ostream &o, const pair<T1, T2> p) { o << '(' << p.first << ':' << p.second << ')'; return o; }
 template<typename T> inline T& chmax(T& to, const T& val) { return to = max(to, val); }
 template<typename T> inline T& chmin(T& to, const T& val) { return to = min(to, val); }
@@ -20,29 +22,19 @@ inline T rand(T l, T h, Random& rand = randdev) { return uniform_int_distributio
 template<typename T, typename Random = decltype(randdev), typename enable_if<is_floating_point<T>::value>::type* = nullptr>
 inline T rand(T l, T h, Random& rand = randdev) { return uniform_real_distribution<T>(l, h)(rand); }template<typename T>
 static ostream& operator<<(ostream& o, const std::vector<T>& v) {
-  o << "[ "; for(const auto& e : v) o<<e<<' ';
-  return o << ']';
+  o << "[ "; for(const auto& e : v) o<<e<<' '; return o << ']';
 }
 
-template <typename I>
-struct MyRangeFormat{ I b,e; MyRangeFormat(I _b, I _e):b(_b),e(_e){} };
-template<typename I>
-static ostream& operator<<(ostream& o, const MyRangeFormat<I>& f) {
-  o << "[ "; iterate(i,f.b,f.e) o<<*i<<' ';
-  return o << ']';
+template <typename I> struct MyRangeFormat{ I b,e; MyRangeFormat(I _b, I _e):b(_b),e(_e){} };
+template<typename I> static ostream& operator<<(ostream& o, const MyRangeFormat<I>& f) {
+  o << "[ "; iterate(i,f.b,f.e) o<<*i<<' '; return o << ']';
 }
-template <typename I>
-struct MyMatrixFormat{
+template <typename I> struct MyMatrixFormat{
   const I& p; long long n, m;
   MyMatrixFormat(const I& _p, long long _n, long long _m):p(_p),n(_n),m(_m){}
 };
-template<typename I>
-static ostream& operator<<(ostream& o, const MyMatrixFormat<I>& f) {
-  o<<'\n';
-  repeat(i,(f.n)) {
-    repeat(j,f.m) o<<f.p[i][j]<<' ';
-    o<<'\n';
-  }
+template<typename I> static ostream& operator<<(ostream& o, const MyMatrixFormat<I>& f) {
+  o<<'\n'; repeat(i,(f.n)) { repeat(j,f.m) o<<f.p[i][j]<<' '; o<<'\n'; }
   return o;
 }
 struct LOG_t { ~LOG_t() { cout << endl; } };
@@ -108,7 +100,7 @@ public:
   inline MaiPrinter& operator<<(char c) noexcept { putc_x(c, fp_); return *this; }
   template<typename T, typename enable_if<is_integral<T>::value, nullptr_t>::type = nullptr>
   inline MaiPrinter& operator<<(T var) noexcept { output_integer<T>(var); return *this; }
-  inline MaiPrinter& operator<<(char* str_p) noexcept { while (*str_p) putc_x(*(str_p++), fp_); return *this; }
+  inline MaiPrinter& operator<<(const char* str_p) noexcept { while (*str_p) putc_x(*(str_p++), fp_); return *this; }
   inline MaiPrinter& operator<<(const string& str) {
     const char* p = str.c_str();
     const char* l = p + str.size();
@@ -119,3 +111,4 @@ public:
 };
 MaiScanner scanner(stdin);
 MaiPrinter printer(stdout);
+// clang-format on
