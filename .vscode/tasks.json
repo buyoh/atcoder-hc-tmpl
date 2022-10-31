@@ -1,14 +1,14 @@
 {
   "tasks": [
     {
-      "type": "cppbuild",
+      "type": "process",  // cppbuild
       "label": "[local] C/C++: g++ build active file",
       "command": "/usr/bin/g++",
       "args": [
         "-g",
-        "${file}",
+        "${workspaceFolder}/src/app/main.cpp",
         "-o",
-        "${fileDirname}/out/${fileBasenameNoExtension}"
+        "${workspaceFolder}/out/${fileBasenameNoExtension}"
       ],
       "options": {
         "cwd": "/usr/bin"
@@ -18,7 +18,7 @@
       ],
       "group": {
         "kind": "build",
-        "isDefault": true
+        // "isDefault": true  // ctrl + shift + B
       },
       "detail": "Generated task by Debugger"
     },
