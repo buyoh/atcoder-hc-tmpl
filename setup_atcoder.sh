@@ -55,6 +55,9 @@ cargo build --release
 popd > /dev/null
 
 script/generate_testcases.sh
-# TODO: setup stdin directory
+rm stdin/* ||:
+cp out/cases/in_0.txt stdin
+cp out/cases/in_1.txt stdin
+cp out/cases/in_2.txt stdin
 
 echo "complete!"
