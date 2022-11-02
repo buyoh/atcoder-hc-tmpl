@@ -1,12 +1,12 @@
 #!/bin/bash
 
-set -eu
 cd `dirname $0`/
 
 SELECTED_LANG=$1
+set -eu
 
 if [[ x$SELECTED_LANG == x ]]; then
-  echo 'switch language: [cpp] [cpp_profile]'
+  echo 'switch language: [cpp] [cpp_profile] [rust]'
   exit 2
 fi
 
