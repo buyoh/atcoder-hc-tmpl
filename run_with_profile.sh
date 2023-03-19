@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -eu
-cd `dirname $0`/..
+cd `dirname $0`/
 
 for FILE in `ls stdin`; do
   ID="${FILE%%.*}"

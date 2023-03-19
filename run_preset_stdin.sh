@@ -1,7 +1,9 @@
 #!/bin/bash
 
+ARGS=$@
+
 set -eu
-cd `dirname $0`/..
+cd `dirname $0`/
 
 if [[ -e vis.html ]]; then
   echo "./vis.html should not exist."
@@ -15,12 +17,16 @@ for FILE in `ls stdin`; do
   FILE_STDERR="out/$ID.err.txt"
 
   echo $FILE
-  ./bin/run.sh < $FILE_STDIN > $FILE_STDOUT 2> $FILE_STDERR
+  ./bin/run.sh $ARGS < $FILE_STDIN > $FILE_STDOUT 2> $FILE_STDERR
 
   # if CALC_SCORE_MYSELF; then
   tail -n1 $FILE_STDERR
+  # TODO: visualize
+  # ./third_party/tools/target/release/vis $FILE_STDIN $FILE_STDOUT
+  # mv vis.png out/$ID.vis.png
   # else
   # ./third_party/tools/target/release/vis $FILE_STDIN $FILE_STDOUT
-  # mv vis.html out/$ID.vis.html
+  # cat vis.html src/vistool.html > out/$ID.vis.html
+  # rm vis.html
   # fi
 done

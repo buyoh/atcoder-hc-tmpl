@@ -35,26 +35,20 @@ rm -rf third_party_tmp
 
 echo "Suppose that it's traditional AtCoder tools and try to build" # but we will not build :(
 
+
+cp bin/atcoder/generate_input_and_list.sh bin/generate_input_and_list.sh
+
 pushd third_party/$TOOL_NAME > /dev/null
-
-if [[ -d third_party/$TOOL_NAME/in/ ]]; then
-  echo "in/ does not exist. abort"
-  exit 2
-fi
-
-cat << EOL > ../../bin/generator_multi.sh
-#!/bin/bash
-
-set -eu
-cd \`dirname \$0\`/..
-ls third_party/$TOOL_NAME/in/*
-EOL
 
 cargo build --release
 
 popd > /dev/null
 
-script/generate_testcases.sh
+if [[ -d third_party/$TOOL_NAME/in/ ]]; then
+  echo "third_party/$TOOL_NAME/in/ exists."
+fi
+
+./generate_testcases.sh 100
 rm stdin/* ||:
 cp out/cases/in_0.txt stdin
 cp out/cases/in_1.txt stdin
