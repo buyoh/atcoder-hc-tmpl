@@ -109,8 +109,8 @@ public:
   }
   template<typename IT> void join(IT begin, IT end, char sep = ' ') { for (bool b = 0; begin != end; ++begin, b = 1) b ? *this << sep << *begin : *this << *begin; }
 };
-// MaiScanner scanner(stdin);
-// MaiPrinter printer(stdout);
+MaiScanner scanner(stdin);
+MaiPrinter printer(stdout);
 // clang-format on
 
 template <typename C = std::chrono::milliseconds> class Timer {
@@ -212,7 +212,7 @@ struct F {
     return data[x + y * width];
   }
   inline T &operator()(P p) {
-    assert_safe(p);
+    assert_safe(p.y, p. x);
     return data[p.x + p.y * width];
   }
   inline T operator()(int y, int x) const {
@@ -220,7 +220,7 @@ struct F {
     return data[x + y * width];
   }
   inline T operator()(P p) const {
-    assert_safe(p);
+    assert_safe(p.y, p.x);
     return data[p.x + p.y * width];
   }
 #else
@@ -245,5 +245,47 @@ struct F {
         os << setw(setw_arg) << operator()(y, x) << ' ';
       os << '\n';
     }
+  }
+};
+
+
+class CommandLine {
+  map<string, string> params;
+
+  void initializeInternal(int argc, char **argv) {
+    for (int i = 1; i < argc; ++i) {
+      if (argv[i][0] == '-') { // TODO: `=` 区切りにしたい
+        if (i + 1 < argc) {
+          params.emplace(argv[i], argv[i + 1]);
+          i += 1;
+        }
+      }
+    }
+  }
+
+  CommandLine() = default;
+
+public:
+  static CommandLine &get() {
+    static CommandLine g;
+    return g;
+  }
+  static void initialize(int argc, char **argv) {
+    get().initializeInternal(argc, argv);
+  }
+  const string &str(const string &key) {
+    static const string empty_str;
+    auto it = params.find(key);
+    if (it == params.end()) {
+      return empty_str;
+    }
+    return it->second;
+  }
+  long long number(const string &key, long long default_value = 0) {
+    auto it = params.find(key);
+    if (it == params.end()) {
+      return default_value;
+    }
+    return atoi(it->second.c_str());
   }
 };
