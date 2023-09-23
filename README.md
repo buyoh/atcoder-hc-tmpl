@@ -15,10 +15,10 @@ workspace for heuristic contest
 - `F5`
   - `"[local] g++ - Build and debug active file"`
   - デバッグ実行する。入力は `stdin/default.txt`。
-- `ctrl + shift + B`
+- `ctrl + shift + B` (deprecated 使ってないので消す予定)
   - 今開いているファイルをビルドする
   - 成果物は out ディレクトリに配置される
-- Run Test Task (shortcutkey unassigned)
+- Run Test Task (shortcutkey unassigned) (deprecated 使ってないので消す予定)
   - stdin ディレクトリにあるファイルを入力として実行する。
   - 結果は out に格納される。
   - https://code.visualstudio.com/docs/getstarted/keybindings#_tasks によると、ショートカットキーが無いので、コマンドパレットから適宜設定する

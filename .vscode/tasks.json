@@ -26,7 +26,7 @@
     {
       "type": "shell",
       "label": "[local] C/C++: run built file from stdin",
-      "command": "${fileDirname}/script/run_stdin_preset.sh",
+      "command": "${fileDirname}/run_preset_stdin.sh",
       "args": [
       ],
       "options": {
@@ -36,7 +36,7 @@
         "kind": "test",
         "isDefault": true
       },
-      "detail": "exec script/run_stdin_preset.sh"
+      "detail": "exec run_preset_stdin.sh"
     }
   ],
   "version": "2.0.0"
