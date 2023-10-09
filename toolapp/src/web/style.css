@@ -1,0 +1,25 @@
+/* TODO: よくわからない */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+NOTE: typeorm に cli-highlight の依存が入っていて、tailwindか何かがこれを引っ張ってきてしまっている？
+よくわからない
+*/
+
+body {
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande", "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+
+/* `.flex .flex-column` as tailwinds */
+.column{
+  display: flex;
+  flex-direction: column;
+}
+
+/* `.flex .flex-row` as tailwinds */
+.row {
+  display: flex;
+  flex-direction: row;
+}

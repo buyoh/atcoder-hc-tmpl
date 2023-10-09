@@ -1,12 +1,17 @@
 import express from 'express';
-import { createViteDevServer } from './ViteDevServer';
+import path from 'path';
+import { applyViteDevMiddlewares } from './ViteDevServer';
+import { applyRESTMiddleWare } from './RESTApiServer';
 
-// const app = express();
+const cwd = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../../');
+const solutionCwd = path.resolve(cwd, '../');
 
-createViteDevServer('./').then(({ app }) => {
-  // app.use(app2);
-
+(async () => {
+  const app = express();
+  await applyRESTMiddleWare(app, cwd, solutionCwd);
+  await applyViteDevMiddlewares(app, cwd);
+  
   app.listen(3000, () => {
     console.log('listening on port 3000');
   });
-});
+})();

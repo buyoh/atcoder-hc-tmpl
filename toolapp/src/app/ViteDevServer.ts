@@ -1,15 +1,13 @@
-import express from 'express';
+import { Express} from 'express';
 import fs from 'fs';
 import path from 'path';
 import { createServer } from 'vite';
 
-//https://zenn.dev/ddpn08/articles/ac30dae3e7c7ea
-export async function createViteDevServer(
+export async function applyViteDevMiddlewares(
+  app: Express,
   cwd: string
-): Promise<{ app: express.Express; vite: any }> {
+): Promise<void> {
   if (!fs.existsSync(cwd)) throw new Error(`No such directory: ${cwd}`);
-  // const app = express.Router();
-  const app = express();
 
   const vite = await createServer({
     root: cwd,
@@ -45,6 +43,4 @@ export async function createViteDevServer(
       }
     }
   });
-
-  return { app, vite };
 }
