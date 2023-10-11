@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { PageIndex} from './pages/Index';
+import { Provider } from 'react-redux';
+import { reduxStore } from './stores/stores';
+import { PageIndex } from './pages/Index';
 import './style.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <PageIndex />
+    <Provider store={reduxStore}>
+      <PageIndex />
+    </Provider>
   </React.StrictMode>
 );

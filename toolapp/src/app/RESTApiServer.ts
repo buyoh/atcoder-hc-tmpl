@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Express } from 'express';
 import { spawn } from 'child_process';
+import { IRequestHandler, TestcaseInfo } from '../interface/Web';
 
 async function execCommand(
   command: string,
@@ -11,7 +12,6 @@ async function execCommand(
 ): Promise<{ stdout: string; stderr: string; code: number }> {
   const child = spawn(command, args, {
     stdio: ['pipe', 'pipe', 'pipe'],
-
   });
   let stdout = '';
   let stderr = '';
@@ -43,9 +43,9 @@ async function execCommandWithFileIO(
   stdinPath: string | null,
   stdoutPath: string | null,
   stderrPath: string | null,
-  timeoutMsec: number): Promise<{ code: number }> {
-  const child = spawn(command, args, {
-  });
+  timeoutMsec: number
+): Promise<{ code: number }> {
+  const child = spawn(command, args, {});
   let stdin, stdout, stderr;
   try {
     // createReadStream may throw an error
@@ -73,7 +73,6 @@ async function execCommandWithFileIO(
   });
 }
 
-
 type FileInfo = {
   path: string;
 };
@@ -87,7 +86,7 @@ class InputFileList {
   }
 
   async scan() {
-    const dirStdin = path.resolve(this.cwd, 'stdin/');
+    const dirStdin = this.baseDir();
     const res = await fs.promises.readdir(dirStdin);
     this.list = res.map((filename) => {
       return { path: filename };
@@ -103,7 +102,7 @@ class InputFileList {
   }
 
   baseDir(): string {
-    const dirStdin = path.resolve(this.cwd, 'stdin');
+    const dirStdin = path.resolve(this.cwd, 'out/cases');
     return dirStdin;
   }
 
@@ -133,7 +132,7 @@ async function startSolution(
     const { code } = await execCommandWithFileIO(
       'bash',
       args,
-      path.resolve(inputBaseDir,  filePath),
+      path.resolve(inputBaseDir, filePath),
       path.resolve(outputBaseDir, filePath + '.out.txt'),
       path.resolve(outputBaseDir, filePath + '.err.txt'),
       2000
@@ -142,12 +141,45 @@ async function startSolution(
   }
 }
 
-export async function applyRESTMiddleWare(app: Express, cwd: string, solutionCwd: string): Promise<void> {
+class RequestHandlerServerImpl implements IRequestHandler {
+  private InputFileList: InputFileList;
+
+  constructor(inputFileList: InputFileList) {
+    this.InputFileList = inputFileList;
+  }
+
+  async getAllTestcasesList(): Promise<TestcaseInfo[]> {
+    const filePaths = this.InputFileList.paths();
+    console.log(filePaths);
+    return filePaths.map((filePath) => ({
+      path: filePath,
+      title: filePath,
+    }));
+  }
+}
+
+export async function applyRESTMiddleWare(
+  app: Express,
+  cwd: string,
+  solutionCwd: string
+): Promise<void> {
   const inputFileList = new InputFileList(solutionCwd);
-  await inputFileList.scan();  // TODO: concurrent
+  await inputFileList.scan(); // TODO: concurrent
+
+  const requestHandler = new RequestHandlerServerImpl(inputFileList);
 
   app.get('/api', (req, res) => {
     res.json({ message: 'Hello from server!' });
+  });
+
+  app.get('/api/testcase', async (req, res, next) => {
+    try {
+      const testcases = await requestHandler.getAllTestcasesList();
+      res.statusCode = 200;
+      res.json({ err: null, body: testcases });
+    } catch (error) {
+      next(error);
+    }
   });
 
   app.post('/api/exec/start', async (req, res, next) => {

@@ -1,4 +1,4 @@
-import { Express} from 'express';
+import { Express } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { createServer } from 'vite';
