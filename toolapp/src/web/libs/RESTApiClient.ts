@@ -24,6 +24,29 @@ class RESTApiClientImpl implements IRequestHandler {
     // TODO: validate
     return json.body;
   }
+
+  async startSolution(): Promise<void> {
+    const url = K_API_URL + '/exec/start';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+    });
+
+    if (response.status !== 200) {
+      console.warn('HTTP Error: ' + response.status);
+      throw new Error('HTTP Error: ' + response.status);
+    }
+
+    const json = await response.json();
+
+    if (json.err !== null) {
+      console.warn('API Error: ' + JSON.stringify(json.err));
+      throw new Error('API Error: ' + JSON.stringify(json.err));
+    }
+  }
 }
 
 export const RESTApiClient = new RESTApiClientImpl();

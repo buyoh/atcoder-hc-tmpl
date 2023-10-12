@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path';
-import { applyViteDevMiddlewares } from './ViteDevServer';
-import { applyRESTMiddleWare } from './RESTApiServer';
+import { applyViteDevMiddlewares } from './express/ViteDevServer';
+import { applyRESTMiddleWare } from './express/RESTApiServer';
 import dotenv from 'dotenv';
 
 dotenv.config();
