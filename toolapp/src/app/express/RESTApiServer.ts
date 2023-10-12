@@ -1,17 +1,10 @@
 import { Express } from 'express';
-import { InputFileListManager } from '../services/InputFileListManager';
-import { RequestHandlerServerImpl } from '../services/RequestHandlerServerImpl';
+import { IRequestHandler } from '../../interface/Web';
 
 export async function applyRESTMiddleWare(
   app: Express,
-  cwd: string,
-  solutionCwd: string
+  requestHandler: IRequestHandler
 ): Promise<void> {
-  const inputFileList = new InputFileListManager(solutionCwd);
-  await inputFileList.scan(); // TODO: concurrent
-
-  const requestHandler = new RequestHandlerServerImpl(inputFileList, cwd);
-
   app.get('/api', (req, res) => {
     res.json({ message: 'Hello from server!' });
   });

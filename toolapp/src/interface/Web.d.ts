@@ -10,4 +10,8 @@ export interface IRequestHandler {
   getAllTestcasesList(): Promise<TestcaseInfo[]>;
   // POST //api/exec/start
   startSolution(): Promise<void>;
+
+  // TODO:
+  // GET //api/job
+  // GET //api/job/:id
 }
