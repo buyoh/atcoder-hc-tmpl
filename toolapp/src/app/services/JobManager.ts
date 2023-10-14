@@ -95,16 +95,54 @@ async function startTask(
 
 // ------------------------------------
 
+export interface JobManagerListener {
+  onJobListUpdated(): void;
+  onJobTaskUpdated(jobId: string): void;
+}
+
+class JobManagerListenerList implements JobManagerListener {
+  private listeners: JobManagerListener[] = [];
+
+  addListener(listener: JobManagerListener) {
+    this.listeners.push(listener);
+  }
+
+  removeListener(listener: JobManagerListener) {
+    this.listeners = this.listeners.filter((l) => l !== listener);
+  }
+
+  onJobListUpdated() {
+    this.listeners.forEach((listener) => listener.onJobListUpdated());
+  }
+
+  onJobTaskUpdated(jobId: string) {
+    this.listeners.forEach((listener) => listener.onJobTaskUpdated(jobId));
+  }
+}
+
+// ------------------------------------
+
 export class JobManager {
 
   private inputFileListManager: InputFileListManager;
   private solutionCwd: string;
-  private jobs: {job: Job, jobState: JobState} [] = [];
+  private jobs: { job: Job, jobState: JobState }[] = [];
+  private jobManagerListenerList = new JobManagerListenerList();
 
   constructor(inputFileListManager: InputFileListManager, solutionCwd: string) {
     this.inputFileListManager = inputFileListManager;
     this.solutionCwd = solutionCwd;
   }
+
+  addListener(listener: JobManagerListener) {
+    this.jobManagerListenerList.addListener(listener);
+  }
+
+  removeListener(listener: JobManagerListener) {
+    this.jobManagerListenerList.removeListener(listener);
+  }
+
+  //
 
   getAllJobs() : {id: string}[] {
     return this.jobs.map(({job}) => ({id: job.id}));
@@ -144,6 +182,7 @@ export class JobManager {
       startTask(task, this.inputFileListManager, this.solutionCwd, (taskState) => {
         console.log(taskState);
         jobState.taskStates[taskIndex] = taskState;
+        this.jobManagerListenerList.onJobTaskUpdated(job.id);
       });
     });
   }
@@ -162,6 +201,8 @@ export class JobManager {
     const job : Job = { tasks, id: generateTekitouId() };
     this.jobs.push({ job, jobState: { taskStates: tasks.map(() => kTaskStateEmpty) } });
     this.startJob(this.jobs.length - 1);
+
+    this.jobManagerListenerList.onJobListUpdated();
   }
 
 }

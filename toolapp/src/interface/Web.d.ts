@@ -32,3 +32,22 @@ export interface IRequestHandler {
   // GET //api/job/:id
   getJob(jobId: string): Promise<{job: IJob, tasks: ITask[]} | null>;
 }
+
+// websocket API の抽象化
+// サーバからクライアントへ
+export interface IConnectionHandlerToClient {
+  onJobListUpdated(): void;
+  onTaskListUpdated(jobId: string): void;
+}
+
+// websocket API の抽象化
+// クライアントからサーバへ
+export interface IConnectionHandlerToServer {
+  // subscribeSomething(id: string | null): void;
+}
+
+// NotImplemented...
+export interface IConnectionStateObserver {
+  onConnected(): void;
+  onDisconnected(): void;
+}

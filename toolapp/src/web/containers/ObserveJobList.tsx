@@ -2,6 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { ReduxStoreState, ReduxStoreDispatch } from '../stores/stores';
 import { updateJobListAsync } from '../stores/App/slices';
+import { IConnectionHandlerToClient } from '../../interface/Web';
+import {
+  subscribeWebSocketHandler,
+  unsubscribeWebSocketHandler,
+} from '../libs/WebsocketFactory';
 
 // ------------------------------------
 
@@ -29,33 +34,37 @@ function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
   return {
     updateJobList: () => {
       dispatch(updateJobListAsync());
-    }
+    },
   };
 }
 
 // ------------------------------------
 
-class ObserveJobList extends React.Component<CombinedProps, State> {
-
-  private timer : number | null = null;
+class ObserveJobList
+  extends React.Component<CombinedProps, State>
+  implements IConnectionHandlerToClient
+{
   constructor(props: CombinedProps) {
     super(props);
     this.state = {};
     // TODO: Update history if needed
   }
 
+  // IConnectionHandlerToClient
+  onJobListUpdated(): void {
+    this.props.updateJobList();
+  }
+  // IConnectionHandlerToClient
+  onTaskListUpdated(jobId: string): void {
+    // TODO: implement and rename ObserveJobList
+  }
+
   componentDidMount(): void {
-    // TODO: Websocket
-    this.timer = window.setInterval(() => {
-      this.props.updateJobList();
-    }, 5000);
+    subscribeWebSocketHandler(this);
   }
 
   componentWillUnmount(): void {
-    if (this.timer !== null) {
-      window.clearInterval(this.timer);
-      this.timer = null;
-    }
+    unsubscribeWebSocketHandler(this);
   }
 
   render(): JSX.Element {
