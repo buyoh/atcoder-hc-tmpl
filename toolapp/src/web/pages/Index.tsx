@@ -2,8 +2,9 @@ import React from 'react';
 import TestCaseList from '../containers/TestCaseList';
 import ObserveTestCase from '../containers/ObserveTestCase';
 import { RESTApiClient } from '../libs/RESTApiClient';
-
-const K_API_URL = ((import.meta as any).env.VITE_API_URL || '') as string;
+import ObserveJobList from '../containers/ObserveJobList';
+import JobList from '../containers/JobList';
+import TaskList from '../containers/TaskList';
 
 // TODO:
 async function handleTestRunClick() {
@@ -14,11 +15,12 @@ export function PageIndex(props: {}): JSX.Element {
   return (
     <>
       <ObserveTestCase />
+      <ObserveJobList />
       <div className="column" style={{ height: '100vh' }}>
         <div className="flex-none">
           <h3 className="text-xl font-bold">App</h3>
         </div>
-        <div className="flex-auto row overflow-hidden">
+        <div className="flex-auto row overflow-y-hidden">
           <div className="flex-none">
             <h3 className="text-xl font-bold">test run</h3>
             <button
@@ -30,6 +32,12 @@ export function PageIndex(props: {}): JSX.Element {
           </div>
           <div className="flex-none overflow-y-scroll">
               <TestCaseList />
+          </div>
+          <div className="flex-none overflow-y-scroll">
+              <JobList />
+          </div>
+          <div className="flex-none overflow-y-scroll">
+              <TaskList />
           </div>
         </div>
       </div>

@@ -6,10 +6,12 @@ import { execCommandWithFileIO } from '../libs/ExecUtil';
 export type TaskStatus = 'pending' | 'running' | 'finished' | 'failed' | 'cancelled';
 
 export type Task = {
+  id: string;
   inputFilePath: string;
 };
 
 export type TaskState = {
+  taskId: string;
   status: TaskStatus;
   exitCode: number | null;
   score: number;
@@ -17,6 +19,7 @@ export type TaskState = {
 };
 
 const kTaskStateEmpty: TaskState = {
+  taskId: '',
   status: 'pending',
   exitCode: null,
   score: 0,
@@ -24,12 +27,20 @@ const kTaskStateEmpty: TaskState = {
 };
 
 export type Job = {
-  // id: string;
-  tasks: Task[];
+  id: string;
+  tasks: Task[];  // TODO: Remove
 };
 
 export type JobState = {
   taskStates : TaskState[];
+}
+
+function generateTekitouId(): string {
+  let s = '';
+  while (s.length < 16) {
+    s += Math.random().toString(36).slice(2);
+  }
+  return s.slice(-16);
 }
 
 // ------------------------------------
@@ -46,11 +57,15 @@ async function startTask(
 
     const inputBaseDir = inputFileListManager.baseDir();
     const outputBaseDir = path.resolve(solutionCwd, 'out');
-  
+
     const filePath = task.inputFilePath;
 
     const args = [bashScriptPath];
-    onTaskStateChanged({ ...kTaskStateEmpty, status: 'running'});
+    onTaskStateChanged({
+      ...kTaskStateEmpty,
+      taskId: task.id,
+      status: 'running',
+    });
     const { code } = await execCommandWithFileIO(
       'bash',
       args,
@@ -59,14 +74,24 @@ async function startTask(
       path.resolve(outputBaseDir, filePath + '.err.txt'),
       2000
     );
-    onTaskStateChanged({ ...kTaskStateEmpty, status: 'finished', exitCode: code, score: 1 });
+    onTaskStateChanged({
+      ...kTaskStateEmpty,
+      taskId: task.id,
+      status: 'finished',
+      exitCode: code,
+      score: 1,
+    });
   } catch (e) {
     console.error(e);
-    onTaskStateChanged({ ...kTaskStateEmpty, status: 'failed', error: `${e}` });
+    onTaskStateChanged({
+      ...kTaskStateEmpty,
+      taskId: task.id,
+      status: 'failed',
+      error: `${e}`,
+    });
     // Reject しない
   }
 }
-
 
 // ------------------------------------
 
@@ -80,6 +105,36 @@ export class JobManager {
     this.inputFileListManager = inputFileListManager;
     this.solutionCwd = solutionCwd;
   }
+
+  getAllJobs() : {id: string}[] {
+    return this.jobs.map(({job}) => ({id: job.id}));
+  }
+
+  getJobTask(jobId: string): {
+    id: string,
+    jobId: string,
+    inputFilePath: string,
+    status: TaskStatus,
+    exitCode: number | null,
+    score: number}[] | null {
+    const job = this.jobs.find(({job}) => job.id === jobId);
+    if (!job) {
+      return null;
+    }
+    
+    return job.job.tasks.map((task, taskIndex) => {
+      // TODO: zip
+      const taskState = job.jobState.taskStates[taskIndex];
+      return {
+        id: task.id,
+        jobId: job.job.id,
+        inputFilePath: task.inputFilePath,
+        status: taskState.status,
+        exitCode: taskState.exitCode,
+        score: taskState.score,
+      };
+    });
+    }
 
   startJob(jobIndex: number) {
     const { job, jobState } = this.jobs[jobIndex];
@@ -97,13 +152,14 @@ export class JobManager {
     const filePaths = this.inputFileListManager.selectPathsByIndices(fileListIndices);
 
     const tasks = filePaths.map((filePath) => ({
+      id: generateTekitouId(),
       state: 'pending',
       inputFilePath: filePath,
       exitCode: null,
       score: 0,
     }));
     
-    const job = { tasks } as Job;
+    const job : Job = { tasks, id: generateTekitouId() };
     this.jobs.push({ job, jobState: { taskStates: tasks.map(() => kTaskStateEmpty) } });
     this.startJob(this.jobs.length - 1);
   }
