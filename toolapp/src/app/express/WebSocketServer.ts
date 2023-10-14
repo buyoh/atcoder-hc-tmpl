@@ -20,7 +20,10 @@ class ConnectionHandlerToClientImpl implements IConnectionHandlerToClient {
     if (this.ws) this.ws.send(JSON.stringify({ method: 'onJobListUpdated' }));
   }
   onTaskListUpdated(jobId: string): void {
-    if (this.ws) this.ws.send(JSON.stringify({ method: 'onJobListUpdated', data: { jobId } }));
+    if (this.ws)
+      this.ws.send(
+        JSON.stringify({ method: 'onJobListUpdated', data: { jobId } })
+      );
   }
 
   invalidate() {

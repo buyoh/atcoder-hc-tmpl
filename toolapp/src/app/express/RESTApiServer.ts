@@ -43,7 +43,7 @@ export async function applyRESTMiddleWare(
     try {
       const jobId = req.params.jobId;
       const job = await requestHandler.getJob(jobId);
-      res.statusCode = 200;  // return 200 even if job is not found
+      res.statusCode = 200; // return 200 even if job is not found
       res.json({ err: null, body: job });
     } catch (error) {
       next(error);

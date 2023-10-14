@@ -21,14 +21,16 @@ const solutionCwd = process.env.APP_WORK_DIRECTORY || path.resolve(cwd, '../');
 console.log('working directory: ', solutionCwd);
 
 (async () => {
-
   const inputFileListManager = new InputFileListManager(solutionCwd);
   await inputFileListManager.scan(); // TODO: concurrent
 
   const jobManager = new JobManager(inputFileListManager, solutionCwd);
 
   const connFactory = new ConnectionHandlerServerFactory(jobManager);
-  const requestHandler = new RequestHandlerServerImpl(inputFileListManager, jobManager);
+  const requestHandler = new RequestHandlerServerImpl(
+    inputFileListManager,
+    jobManager
+  );
 
   const app = express();
   await applyWebSocketMiddleware(app, connFactory);

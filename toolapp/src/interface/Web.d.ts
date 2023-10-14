@@ -3,7 +3,12 @@ export interface ITestcaseInfo {
   title: string;
 }
 
-export type ITaskStatus = 'pending' | 'running' | 'finished' | 'failed' | 'cancelled';
+export type ITaskStatus =
+  | 'pending'
+  | 'running'
+  | 'finished'
+  | 'failed'
+  | 'cancelled';
 
 export interface ITask {
   id: string;
@@ -30,7 +35,7 @@ export interface IRequestHandler {
   // GET //api/job
   getAllJobs(): Promise<IJob[]>;
   // GET //api/job/:id
-  getJob(jobId: string): Promise<{job: IJob, tasks: ITask[]} | null>;
+  getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[] } | null>;
 }
 
 // websocket API の抽象化

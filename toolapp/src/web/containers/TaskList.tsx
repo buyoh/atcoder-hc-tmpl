@@ -13,8 +13,7 @@ type StateProps = {
   tasks: ITask[];
 };
 
-type DispatchProps = {
-};
+type DispatchProps = {};
 
 type CombinedProps = Props & StateProps & DispatchProps;
 
@@ -25,8 +24,7 @@ function mapStateToProps(state: ReduxStoreState): StateProps {
 }
 
 function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
-  return {
-  };
+  return {};
 }
 
 // ------------------------------------
@@ -43,7 +41,9 @@ class TaskList extends React.Component<CombinedProps, State> {
         {this.props.tasks.map((task) => {
           return (
             <li key={task.id}>
-              <a>{task.inputFilePath}: {task.score}</a>
+              <a>
+                {task.inputFilePath}: {task.score}
+              </a>
             </li>
           );
         })}

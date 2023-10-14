@@ -1,12 +1,20 @@
-import { IJob, IRequestHandler, ITask, ITestcaseInfo } from '../../interface/Web';
+import {
+  IJob,
+  IRequestHandler,
+  ITask,
+  ITestcaseInfo,
+} from '../../interface/Web';
 import { InputFileListManager } from './InputFileListManager';
 import { JobManager } from './JobManager';
 
 export class RequestHandlerServerImpl implements IRequestHandler {
   private inputFileListManager: InputFileListManager;
-  private jobManager: JobManager
+  private jobManager: JobManager;
 
-  constructor(inputFileListManager: InputFileListManager, jobManager: JobManager) {
+  constructor(
+    inputFileListManager: InputFileListManager,
+    jobManager: JobManager
+  ) {
     this.inputFileListManager = inputFileListManager;
     this.jobManager = jobManager;
   }
@@ -28,7 +36,7 @@ export class RequestHandlerServerImpl implements IRequestHandler {
       id,
     }));
   }
-  async getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[]; } | null> {
+  async getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[] } | null> {
     const tasks = this.jobManager.getJobTask(jobId);
     if (!tasks) {
       return null;

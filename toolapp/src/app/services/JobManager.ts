@@ -3,7 +3,12 @@ import path from 'path';
 import { InputFileListManager } from './InputFileListManager';
 import { execCommandWithFileIO } from '../libs/ExecUtil';
 
-export type TaskStatus = 'pending' | 'running' | 'finished' | 'failed' | 'cancelled';
+export type TaskStatus =
+  | 'pending'
+  | 'running'
+  | 'finished'
+  | 'failed'
+  | 'cancelled';
 
 export type Task = {
   id: string;
@@ -28,12 +33,12 @@ const kTaskStateEmpty: TaskState = {
 
 export type Job = {
   id: string;
-  tasks: Task[];  // TODO: Remove
+  tasks: Task[]; // TODO: Remove
 };
 
 export type JobState = {
-  taskStates : TaskState[];
-}
+  taskStates: TaskState[];
+};
 
 function generateTekitouId(): string {
   let s = '';
@@ -48,7 +53,7 @@ function generateTekitouId(): string {
 // TODO: 中断するためのColtrollerと完了通知のListener
 async function startTask(
   task: Task,
-  inputFileListManager: InputFileListManager,  // TODO: remove
+  inputFileListManager: InputFileListManager, // TODO: remove
   solutionCwd: string,
   onTaskStateChanged: (taskState: TaskState) => void
 ) {
@@ -123,10 +128,9 @@ class JobManagerListenerList implements JobManagerListener {
 // ------------------------------------
 
 export class JobManager {
-
   private inputFileListManager: InputFileListManager;
   private solutionCwd: string;
-  private jobs: { job: Job, jobState: JobState }[] = [];
+  private jobs: { job: Job; jobState: JobState }[] = [];
   private jobManagerListenerList = new JobManagerListenerList();
 
   constructor(inputFileListManager: InputFileListManager, solutionCwd: string) {
@@ -144,22 +148,25 @@ export class JobManager {
 
   //
 
-  getAllJobs() : {id: string}[] {
-    return this.jobs.map(({job}) => ({id: job.id}));
+  getAllJobs(): { id: string }[] {
+    return this.jobs.map(({ job }) => ({ id: job.id }));
   }
 
-  getJobTask(jobId: string): {
-    id: string,
-    jobId: string,
-    inputFilePath: string,
-    status: TaskStatus,
-    exitCode: number | null,
-    score: number}[] | null {
-    const job = this.jobs.find(({job}) => job.id === jobId);
+  getJobTask(jobId: string):
+    | {
+        id: string;
+        jobId: string;
+        inputFilePath: string;
+        status: TaskStatus;
+        exitCode: number | null;
+        score: number;
+      }[]
+    | null {
+    const job = this.jobs.find(({ job }) => job.id === jobId);
     if (!job) {
       return null;
     }
-    
+
     return job.job.tasks.map((task, taskIndex) => {
       // TODO: zip
       const taskState = job.jobState.taskStates[taskIndex];
@@ -172,23 +179,29 @@ export class JobManager {
         score: taskState.score,
       };
     });
-    }
+  }
 
   startJob(jobIndex: number) {
     const { job, jobState } = this.jobs[jobIndex];
     console.log(jobIndex);
     job.tasks.map((task, taskIndex) => {
       // TODO: 同時実行数の上限
-      startTask(task, this.inputFileListManager, this.solutionCwd, (taskState) => {
-        console.log(taskState);
-        jobState.taskStates[taskIndex] = taskState;
-        this.jobManagerListenerList.onJobTaskUpdated(job.id);
-      });
+      startTask(
+        task,
+        this.inputFileListManager,
+        this.solutionCwd,
+        (taskState) => {
+          console.log(taskState);
+          jobState.taskStates[taskIndex] = taskState;
+          this.jobManagerListenerList.onJobTaskUpdated(job.id);
+        }
+      );
     });
   }
 
   addJob(fileListIndices: number[]) {
-    const filePaths = this.inputFileListManager.selectPathsByIndices(fileListIndices);
+    const filePaths =
+      this.inputFileListManager.selectPathsByIndices(fileListIndices);
 
     const tasks = filePaths.map((filePath) => ({
       id: generateTekitouId(),
@@ -197,13 +210,14 @@ export class JobManager {
       exitCode: null,
       score: 0,
     }));
-    
-    const job : Job = { tasks, id: generateTekitouId() };
-    this.jobs.push({ job, jobState: { taskStates: tasks.map(() => kTaskStateEmpty) } });
+
+    const job: Job = { tasks, id: generateTekitouId() };
+    this.jobs.push({
+      job,
+      jobState: { taskStates: tasks.map(() => kTaskStateEmpty) },
+    });
     this.startJob(this.jobs.length - 1);
 
     this.jobManagerListenerList.onJobListUpdated();
   }
-
 }
-

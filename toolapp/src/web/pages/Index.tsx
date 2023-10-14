@@ -31,13 +31,13 @@ export function PageIndex(props: {}): JSX.Element {
             </button>
           </div>
           <div className="flex-none overflow-y-scroll">
-              <TestCaseList />
+            <TestCaseList />
           </div>
           <div className="flex-none overflow-y-scroll">
-              <JobList />
+            <JobList />
           </div>
           <div className="flex-none overflow-y-scroll">
-              <TaskList />
+            <TaskList />
           </div>
         </div>
       </div>

@@ -1,5 +1,8 @@
-import { IConnectionHandlerToClient, IConnectionHandlerToServer } from "../../interface/Web";
-import { JobManager, JobManagerListener } from "./JobManager";
+import {
+  IConnectionHandlerToClient,
+  IConnectionHandlerToServer,
+} from '../../interface/Web';
+import { JobManager, JobManagerListener } from './JobManager';
 
 export interface ConnectionHandler {
   disconnect(): void;
@@ -23,7 +26,9 @@ class JobManagerListenerImpl implements JobManagerListener {
   }
 }
 
-class ConnectionHandlerImpl implements ConnectionHandler, IConnectionHandlerToServer {
+class ConnectionHandlerImpl
+  implements ConnectionHandler, IConnectionHandlerToServer
+{
   private client: IConnectionHandlerToClient;
   private jobManager: JobManager;
   private jobManagerListenerImpl: JobManagerListenerImpl;
@@ -47,11 +52,11 @@ export class ConnectionHandlerServerFactory {
     this.jobManager = jobManager;
   }
 
-  startConnection(client: IConnectionHandlerToClient):
-    ConnectionHandler & IConnectionHandlerToServer {
-
+  startConnection(
+    client: IConnectionHandlerToClient
+  ): ConnectionHandler & IConnectionHandlerToServer {
     const handler = new ConnectionHandlerImpl(client, this.jobManager);
-    
+
     return handler;
   }
 }

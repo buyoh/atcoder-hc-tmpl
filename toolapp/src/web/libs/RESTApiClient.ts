@@ -68,7 +68,7 @@ class RESTApiClientImpl implements IRequestHandler {
     return json.body;
   }
 
-  async getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[]; } | null> {
+  async getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[] } | null> {
     const url = K_API_URL + '/job/' + jobId;
     const response = await fetch(url, {
       method: 'GET',

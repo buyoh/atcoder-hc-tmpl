@@ -7,7 +7,6 @@ export interface AppState {
   jobs: IJob[];
   selectedJobId: string | null;
   tasksOfSelectedJobs: ITask[];
-
 }
 
 const kInitialAppState: AppState = {
