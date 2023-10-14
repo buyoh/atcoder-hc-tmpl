@@ -12,19 +12,27 @@ async function handleTestRunClick() {
 
 export function PageIndex(props: {}): JSX.Element {
   return (
-    <div className="block flex-none" style={{ height: '100vh' }}>
+    <>
       <ObserveTestCase />
-      <h2 className="text-xl font-bold">App</h2>
-      <h3 className="text-xl font-bold">test run</h3>
-      <button
-        className="block btn btn-lg btn-primary"
-        onClick={handleTestRunClick}
-      >
-        test run
-      </button>
-      <div>
-        <TestCaseList />
+      <div className="column" style={{ height: '100vh' }}>
+        <div className="flex-none">
+          <h3 className="text-xl font-bold">App</h3>
+        </div>
+        <div className="flex-auto row overflow-hidden">
+          <div className="flex-none">
+            <h3 className="text-xl font-bold">test run</h3>
+            <button
+              className="block btn btn-lg btn-primary"
+              onClick={handleTestRunClick}
+            >
+              test run
+            </button>
+          </div>
+          <div className="flex-none overflow-y-scroll">
+              <TestCaseList />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
