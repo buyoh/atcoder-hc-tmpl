@@ -33,11 +33,6 @@ const kTaskStateEmpty: TaskState = {
 
 export type Job = {
   id: string;
-  tasks: Task[]; // TODO: Remove
-};
-
-export type JobState = {
-  taskStates: TaskState[];
 };
 
 function generateTekitouId(): string {
@@ -130,7 +125,7 @@ class JobManagerListenerList implements JobManagerListener {
 export class JobManager {
   private inputFileListManager: InputFileListManager;
   private solutionCwd: string;
-  private jobs: { job: Job; jobState: JobState }[] = [];
+  private jobs: { job: Job; tasks: Task[]; taskStates: TaskState[] }[] = [];
   private jobManagerListenerList = new JobManagerListenerList();
 
   constructor(inputFileListManager: InputFileListManager, solutionCwd: string) {
@@ -167,9 +162,11 @@ export class JobManager {
       return null;
     }
 
-    return job.job.tasks.map((task, taskIndex) => {
+    const { tasks, taskStates } = job;
+
+    return tasks.map((task, taskIndex) => {
       // TODO: zip
-      const taskState = job.jobState.taskStates[taskIndex];
+      const taskState = taskStates[taskIndex];
       return {
         id: task.id,
         jobId: job.job.id,
@@ -182,9 +179,9 @@ export class JobManager {
   }
 
   startJob(jobIndex: number) {
-    const { job, jobState } = this.jobs[jobIndex];
+    const { job, tasks, taskStates } = this.jobs[jobIndex];
     console.log(jobIndex);
-    job.tasks.map((task, taskIndex) => {
+    tasks.map((task, taskIndex) => {
       // TODO: 同時実行数の上限
       startTask(
         task,
@@ -192,7 +189,7 @@ export class JobManager {
         this.solutionCwd,
         (taskState) => {
           console.log(taskState);
-          jobState.taskStates[taskIndex] = taskState;
+          taskStates[taskIndex] = taskState;
           this.jobManagerListenerList.onJobTaskUpdated(job.id);
         }
       );
@@ -211,10 +208,11 @@ export class JobManager {
       score: 0,
     }));
 
-    const job: Job = { tasks, id: generateTekitouId() };
+    const job: Job = { id: generateTekitouId() };
     this.jobs.push({
       job,
-      jobState: { taskStates: tasks.map(() => kTaskStateEmpty) },
+      tasks,
+      taskStates: tasks.map(() => kTaskStateEmpty),
     });
     this.startJob(this.jobs.length - 1);
 
