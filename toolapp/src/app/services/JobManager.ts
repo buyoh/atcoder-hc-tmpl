@@ -2,38 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { InputFileListManager } from './InputFileListManager';
 import { execCommandWithFileIO } from '../libs/ExecUtil';
-
-export type TaskStatus =
-  | 'pending'
-  | 'running'
-  | 'finished'
-  | 'failed'
-  | 'cancelled';
-
-export type Task = {
-  id: string;
-  inputFilePath: string;
-};
-
-export type TaskState = {
-  taskId: string;
-  status: TaskStatus;
-  exitCode: number | null;
-  score: number;
-  error: string | null;
-};
-
-const kTaskStateEmpty: TaskState = {
-  taskId: '',
-  status: 'pending',
-  exitCode: null,
-  score: 0,
-  error: null,
-};
-
-export type Job = {
-  id: string;
-};
+import { TaskState, Task, Job, TaskStatus } from '../libs/JobTask';
+import { DatabaseService } from './DatabaseService';
 
 function generateTekitouId(): string {
   let s = '';
@@ -42,6 +12,14 @@ function generateTekitouId(): string {
   }
   return s.slice(-16);
 }
+
+const kTaskStateEmpty: TaskState = {
+  // taskId: '',
+  status: 'pending',
+  exitCode: null,
+  score: 0,
+  error: null,
+};
 
 // ------------------------------------
 
@@ -63,7 +41,7 @@ async function startTask(
     const args = [bashScriptPath];
     onTaskStateChanged({
       ...kTaskStateEmpty,
-      taskId: task.id,
+      // taskId: task.id,
       status: 'running',
     });
     const { code } = await execCommandWithFileIO(
@@ -76,7 +54,7 @@ async function startTask(
     );
     onTaskStateChanged({
       ...kTaskStateEmpty,
-      taskId: task.id,
+      // taskId: task.id,
       status: 'finished',
       exitCode: code,
       score: 1,
@@ -85,7 +63,7 @@ async function startTask(
     console.error(e);
     onTaskStateChanged({
       ...kTaskStateEmpty,
-      taskId: task.id,
+      // taskId: task.id,
       status: 'failed',
       error: `${e}`,
     });
@@ -125,12 +103,18 @@ class JobManagerListenerList implements JobManagerListener {
 export class JobManager {
   private inputFileListManager: InputFileListManager;
   private solutionCwd: string;
-  private jobs: { job: Job; tasks: Task[]; taskStates: TaskState[] }[] = [];
+  private databaseService: DatabaseService;
+  // private jobs: { job: Job; tasks: Task[]; taskStates: TaskState[] }[] = [];
   private jobManagerListenerList = new JobManagerListenerList();
 
-  constructor(inputFileListManager: InputFileListManager, solutionCwd: string) {
+  constructor(
+    inputFileListManager: InputFileListManager,
+    solutionCwd: string,
+    databaseService: DatabaseService
+  ) {
     this.inputFileListManager = inputFileListManager;
     this.solutionCwd = solutionCwd;
+    this.databaseService = databaseService;
   }
 
   addListener(listener: JobManagerListener) {
@@ -143,78 +127,55 @@ export class JobManager {
 
   //
 
-  getAllJobs(): { id: string }[] {
-    return this.jobs.map(({ job }) => ({ id: job.id }));
-  }
-
-  getJobTask(jobId: string):
-    | {
-        id: string;
-        jobId: string;
-        inputFilePath: string;
-        status: TaskStatus;
-        exitCode: number | null;
-        score: number;
-      }[]
-    | null {
-    const job = this.jobs.find(({ job }) => job.id === jobId);
-    if (!job) {
-      return null;
+  async startJob(jobId: string) {
+    const mayJobTasksPair = await this.databaseService.getJob(jobId);
+    if (!mayJobTasksPair) {
+      // TODO: ハンドル方法が分からない 後で考え直す
+      console.error('Job not found');
+      return;
     }
+    const { job, tasks } = mayJobTasksPair;
 
-    const { tasks, taskStates } = job;
-
-    return tasks.map((task, taskIndex) => {
-      // TODO: zip
-      const taskState = taskStates[taskIndex];
-      return {
-        id: task.id,
-        jobId: job.job.id,
-        inputFilePath: task.inputFilePath,
-        status: taskState.status,
-        exitCode: taskState.exitCode,
-        score: taskState.score,
-      };
-    });
-  }
-
-  startJob(jobIndex: number) {
-    const { job, tasks, taskStates } = this.jobs[jobIndex];
-    console.log(jobIndex);
-    tasks.map((task, taskIndex) => {
+    // const { job, tasks, taskStates } = this.jobs[jobIndex];
+    tasks.map((task) => {
       // TODO: 同時実行数の上限
       startTask(
         task,
         this.inputFileListManager,
         this.solutionCwd,
-        (taskState) => {
+        async (taskState) => {
           console.log(taskState);
-          taskStates[taskIndex] = taskState;
+          // updateTaskState が終わってから onJobTaskUpdated を呼ぶ
+          await this.databaseService.updateTaskState(task.id, taskState);
           this.jobManagerListenerList.onJobTaskUpdated(job.id);
         }
       );
     });
   }
 
-  addJob(fileListIndices: number[]) {
+  async addJob(fileListIndices: number[]) {
     const filePaths =
       this.inputFileListManager.selectPathsByIndices(fileListIndices);
 
-    const tasks = filePaths.map((filePath) => ({
-      id: generateTekitouId(),
-      state: 'pending',
-      inputFilePath: filePath,
-      exitCode: null,
-      score: 0,
-    }));
+    // const tasks = filePaths.map((filePath) => ({
+    //   id: generateTekitouId(),
+    //   state: 'pending',
+    //   inputFilePath: filePath,
+    //   exitCode: null,
+    //   score: 0,
+    // }));
 
-    const job: Job = { id: generateTekitouId() };
-    this.jobs.push({
-      job,
-      tasks,
-      taskStates: tasks.map(() => kTaskStateEmpty),
-    });
-    this.startJob(this.jobs.length - 1);
+    // const job: Job = { id: generateTekitouId() };
+    // this.jobs.push({
+    //   job,
+    //   tasks,
+    //   taskStates: tasks.map(() => kTaskStateEmpty),
+    // });
+    // this.startJob(this.jobs.length - 1);
+
+    const job = await this.databaseService.createJobAndTasks(filePaths);
+
+    this.startJob(job.id);
 
     this.jobManagerListenerList.onJobListUpdated();
   }

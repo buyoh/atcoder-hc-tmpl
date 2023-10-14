@@ -4,18 +4,22 @@ import {
   ITask,
   ITestcaseInfo,
 } from '../../interface/Web';
+import { DatabaseService } from './DatabaseService';
 import { InputFileListManager } from './InputFileListManager';
 import { JobManager } from './JobManager';
 
 export class RequestHandlerServerImpl implements IRequestHandler {
   private inputFileListManager: InputFileListManager;
+  private databaseService: DatabaseService;
   private jobManager: JobManager;
 
   constructor(
     inputFileListManager: InputFileListManager,
+    databaseService: DatabaseService,
     jobManager: JobManager
   ) {
     this.inputFileListManager = inputFileListManager;
+    this.databaseService = databaseService;
     this.jobManager = jobManager;
   }
 
@@ -32,22 +36,23 @@ export class RequestHandlerServerImpl implements IRequestHandler {
   }
 
   async getAllJobs(): Promise<IJob[]> {
-    return this.jobManager.getAllJobs().map(({ id }) => ({
-      id,
-    }));
+    const jobs = await this.databaseService.getAllJobs();
+    return jobs.map((job) => ({ id: job.id }));
   }
+
   async getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[] } | null> {
-    const tasks = this.jobManager.getJobTask(jobId);
-    if (!tasks) {
+    const mayJobTasksPair = await this.databaseService.getJob(jobId);
+    if (!mayJobTasksPair) {
       return null;
     }
+    const { tasks } = mayJobTasksPair;
     return {
       job: {
         id: jobId,
       },
       tasks: tasks.map((task) => ({
         id: task.id,
-        jobId: task.jobId,
+        jobId: jobId,
         inputFilePath: task.inputFilePath,
         status: task.status,
         exitCode: task.exitCode,

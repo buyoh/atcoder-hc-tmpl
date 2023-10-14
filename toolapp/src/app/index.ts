@@ -8,6 +8,7 @@ import { InputFileListManager } from './services/InputFileListManager';
 import { RequestHandlerServerImpl } from './services/RequestHandlerServerImpl';
 import { applyWebSocketMiddleware } from './express/WebSocketServer';
 import { ConnectionHandlerServerFactory } from './services/ConnectionHandlerServer';
+import { createDatabaseService } from './services/DatabaseService';
 
 dotenv.config();
 dotenv.config({ path: `.env.local`, override: true });
@@ -24,11 +25,18 @@ console.log('working directory: ', solutionCwd);
   const inputFileListManager = new InputFileListManager(solutionCwd);
   await inputFileListManager.scan(); // TODO: concurrent
 
-  const jobManager = new JobManager(inputFileListManager, solutionCwd);
+  const databaseService = createDatabaseService();
+  await databaseService.initialize();
+  const jobManager = new JobManager(
+    inputFileListManager,
+    solutionCwd,
+    databaseService
+  );
 
   const connFactory = new ConnectionHandlerServerFactory(jobManager);
   const requestHandler = new RequestHandlerServerImpl(
     inputFileListManager,
+    databaseService,
     jobManager
   );
 
