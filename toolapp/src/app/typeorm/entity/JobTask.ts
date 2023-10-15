@@ -29,7 +29,7 @@ export class Task {
 
   // conversationId は conversation によって自動的に値が設定される。
   // typeorm から値を取得するために定義する
-  @Column('string', { nullable: true })
+  @Column('uuid')
   jobId!: string;
 
   @ManyToOne(() => Job)
