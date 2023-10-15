@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { ReduxStoreState, ReduxStoreDispatch } from '../stores/stores';
-import { updateJobListAsync } from '../stores/App/slices';
+import { updateJobListAsync, updateTaskListAsync } from '../stores/App/slices';
 import { IConnectionHandlerToClient } from '../../interface/Web';
 import {
   subscribeWebSocketHandler,
@@ -15,18 +15,19 @@ type Props = {};
 type State = {};
 
 type StateProps = {
-  // testcases: { path: string; title: string }[];
+  selectedJobId: string | null;
 };
 
 type DispatchProps = {
   updateJobList: () => void;
+  updateTasks: (jobId: string) => void;
 };
 
 type CombinedProps = Props & StateProps & DispatchProps;
 
 function mapStateToProps(state: ReduxStoreState): StateProps {
   return {
-    // testcases: state.app.testcases,
+    selectedJobId: state.app.selectedJobId,
   };
 }
 
@@ -35,11 +36,15 @@ function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
     updateJobList: () => {
       dispatch(updateJobListAsync());
     },
+    updateTasks: (jobId: string) => {
+      dispatch(updateTaskListAsync({jobId, changeJobId: false}));
+    }
   };
 }
 
 // ------------------------------------
 
+// TODO: Rename
 class ObserveJobList
   extends React.Component<CombinedProps, State>
   implements IConnectionHandlerToClient
@@ -56,11 +61,18 @@ class ObserveJobList
   }
   // IConnectionHandlerToClient
   onTaskListUpdated(jobId: string): void {
-    // TODO: implement and rename ObserveJobList
+    if (this.props.selectedJobId === jobId) {
+      this.props.updateTasks(jobId);
+    }
   }
 
   componentDidMount(): void {
     subscribeWebSocketHandler(this);
+    // First load
+    this.props.updateJobList();
+    if (this.props.selectedJobId !== null) {
+      this.props.updateTasks(this.props.selectedJobId);
+    }
   }
 
   componentWillUnmount(): void {

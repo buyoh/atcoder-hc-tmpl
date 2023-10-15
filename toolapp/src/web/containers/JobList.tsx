@@ -28,7 +28,7 @@ function mapStateToProps(state: ReduxStoreState): StateProps {
 function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
   return {
     selectJob: (jobId: string) => {
-      dispatch(updateTaskListAsync(jobId));
+      dispatch(updateTaskListAsync({jobId, changeJobId: true}));
     },
   };
 }

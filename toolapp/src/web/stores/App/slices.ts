@@ -40,7 +40,8 @@ export const updateJobListAsync = createAsyncThunk(
 
 export const updateTaskListAsync = createAsyncThunk(
   'app/job/task/Update',
-  async (jobId: string) => {
+  async (tasks: { jobId: string, changeJobId?: boolean }) => {
+    const {jobId, changeJobId} = tasks;
     const job = await RESTApiClient.getJob(jobId);
     if (job === null) {
       return {
@@ -50,6 +51,7 @@ export const updateTaskListAsync = createAsyncThunk(
     }
     return {
       jobId,
+      changeJobId,
       tasks: job.tasks,
     };
   }
@@ -83,8 +85,11 @@ const appSlice = createSlice({
     // 一方でupdateTaskListAsyncはjobIdによって読み込む情報が変わる
     // 異なるクエリが連続でくると、前のクエリの結果が後のクエリの結果を上書きしてしまう
     builder.addCase(updateTaskListAsync.fulfilled, (state, action) => {
-      state.selectedJobId = action.payload.jobId;
-      state.tasksOfSelectedJobs = action.payload.tasks;
+      const { jobId, changeJobId, tasks } = action.payload;
+      if (changeJobId || state.selectedJobId === jobId) {
+        state.selectedJobId = jobId;
+        state.tasksOfSelectedJobs = tasks;
+      }
     });
   },
 });
