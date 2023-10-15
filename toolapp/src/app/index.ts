@@ -9,6 +9,7 @@ import { RequestHandlerServerImpl } from './services/RequestHandlerServerImpl';
 import { applyWebSocketMiddleware } from './express/WebSocketServer';
 import { ConnectionHandlerServerFactory } from './services/ConnectionHandlerServer';
 import { createDatabaseService } from './services/DatabaseService';
+import { applyStaticAssetsMiddlewares } from './express/StaticServer';
 
 dotenv.config();
 dotenv.config({ path: `.env.local`, override: true });
@@ -18,6 +19,8 @@ const cwd = path.resolve(
   '../../'
 );
 const solutionCwd = process.env.APP_WORK_DIRECTORY || path.resolve(cwd, '../');
+
+const useViteServer = process.env.APP_FRONTEND_MIDDLEWARE !== 'static';
 
 console.log('working directory: ', solutionCwd);
 
@@ -43,7 +46,10 @@ console.log('working directory: ', solutionCwd);
   const app = express();
   await applyWebSocketMiddleware(app, connFactory);
   await applyRESTMiddleWare(app, requestHandler);
-  await applyViteDevMiddlewares(app, cwd);
+  if (useViteServer)
+    await applyViteDevMiddlewares(app, cwd);
+  else
+    await applyStaticAssetsMiddlewares(app, cwd);
 
   app.listen(3000, () => {
     console.log('listening on port 3000');
