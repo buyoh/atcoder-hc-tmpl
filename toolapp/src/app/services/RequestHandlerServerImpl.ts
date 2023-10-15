@@ -36,7 +36,7 @@ export class RequestHandlerServerImpl implements IRequestHandler {
 
   async getAllJobs(): Promise<IJob[]> {
     const jobs = await this.databaseService.getAllJobs();
-    return jobs.map((job) => ({ id: job.id }));
+    return jobs.map((job) => ({ id: job.id, createdAtISO: job.createdAt.toISOString() }));
   }
 
   async getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[] } | null> {
@@ -44,10 +44,11 @@ export class RequestHandlerServerImpl implements IRequestHandler {
     if (!mayJobTasksPair) {
       return null;
     }
-    const { tasks } = mayJobTasksPair;
+    const { job, tasks } = mayJobTasksPair;
     return {
       job: {
         id: jobId,
+        createdAtISO: job.createdAt.toISOString(),
       },
       tasks: tasks.map((task) => ({
         id: task.id,

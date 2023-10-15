@@ -21,6 +21,7 @@ export interface ITask {
 
 export interface IJob {
   id: string;
+  createdAtISO: string;
 }
 
 // HTTP/REST API の抽象化

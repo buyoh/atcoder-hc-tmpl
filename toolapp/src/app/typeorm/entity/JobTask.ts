@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   CreateDateColumn,
-  Timestamp,
 } from 'typeorm';
 
 @Entity()
@@ -17,10 +16,10 @@ export class Job {
   // title!: string;
 
   @CreateDateColumn()
-  created!: Timestamp;
+  createdAt!: Date;
 
   // @UpdateDateColumn()
-  // updated!: Timestamp;
+  // updatedAt!: Date;
 }
 
 @Entity()
@@ -50,8 +49,8 @@ export class Task {
   score!: number;
 
   @CreateDateColumn()
-  created!: Timestamp;
+  createdAt!: Date;
 
   // @UpdateDateColumn()
-  // updated!: Timestamp;
+  // updatedAt!: Date;
 }

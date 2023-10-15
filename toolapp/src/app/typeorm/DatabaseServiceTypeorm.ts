@@ -41,7 +41,7 @@ export class DatabaseServiceTypeorm implements DatabaseService {
       if (ret === undefined) {
         throw new Error('transaction failed');
       }
-      return { id: ret.id };
+      return { id: ret.id, createdAt: ret.createdAt };
     } catch (e) {
       console.error(e);
       throw e;
@@ -54,7 +54,7 @@ export class DatabaseServiceTypeorm implements DatabaseService {
     }
     try {
       const jobRepo = this.dataSource.getRepository(EJob);
-      return (await jobRepo.find()).map((job) => ({ id: job.id }));
+      return (await jobRepo.find()).map((job) => ({ id: job.id, createdAt: job.createdAt }));
     } catch (e) {
       console.error(e);
       throw e;
@@ -82,6 +82,7 @@ export class DatabaseServiceTypeorm implements DatabaseService {
           return {
             job: {
               id: job.id,
+              createdAt: job.createdAt,
             },
             tasks: tasks.map((task) => ({
               id: task.id,

@@ -10,7 +10,8 @@ type Props = {};
 type State = {};
 
 type StateProps = {
-  jobs: { id: string }[];
+  jobs: { id: string, createdAt: Date }[];
+  selectedJobId: string | null;
 };
 
 type DispatchProps = {
@@ -21,14 +22,15 @@ type CombinedProps = Props & StateProps & DispatchProps;
 
 function mapStateToProps(state: ReduxStoreState): StateProps {
   return {
-    jobs: state.app.jobs.map((job) => ({ id: job.id })),
+    jobs: state.app.jobs.map((job) => ({ id: job.id, createdAt: new Date(job.createdAtISO) })),
+    selectedJobId: state.app.selectedJobId,
   };
 }
 
 function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
   return {
     selectJob: (jobId: string) => {
-      dispatch(updateTaskListAsync({jobId, changeJobId: true}));
+      dispatch(updateTaskListAsync({ jobId, changeJobId: true }));
     },
   };
 }
@@ -46,12 +48,18 @@ class JobList extends React.Component<CombinedProps, State> {
   }
 
   render(): JSX.Element {
+    // TODO: Locale???
     return (
       <ul className="menu bg-base-200 w-56 rounded-box">
         {this.props.jobs.map((job) => {
           return (
             <li key={job.id}>
-              <a onClick={this.handleJobClick.bind(this, job.id)}>{job.id}</a>
+              <a
+                onClick={this.handleJobClick.bind(this, job.id)}
+                className={this.props.selectedJobId === job.id ? 'active' : ''}
+              >
+                {job.id.substr(0, 6)} <br />{job.createdAt.toLocaleString('ja-JP')}
+              </a>
             </li>
           );
         })}

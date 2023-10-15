@@ -19,4 +19,5 @@ export type TaskState = {
 };
 export type Job = {
   id: string;
+  createdAt: Date;
 };
