@@ -42,7 +42,6 @@ class JobList extends React.Component<CombinedProps, State> {
   }
 
   handleJobClick(jobId: string): void {
-    console.log(jobId);
     this.props.selectJob(jobId);
   }
 

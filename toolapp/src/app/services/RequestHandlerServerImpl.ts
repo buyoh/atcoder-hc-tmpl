@@ -25,7 +25,6 @@ export class RequestHandlerServerImpl implements IRequestHandler {
 
   async getAllTestcasesList(): Promise<ITestcaseInfo[]> {
     const filePaths = this.inputFileListManager.paths();
-    console.log(filePaths);
     return filePaths.map((filePath) => ({
       path: filePath,
       title: filePath,

@@ -69,7 +69,7 @@ export async function applyWebSocketMiddleware(
     });
 
     ws.on('error', (err) => {
-      console.log('ws error: ', err);
+      console.warn('ws error: ', err);
       finalize();
     });
   });

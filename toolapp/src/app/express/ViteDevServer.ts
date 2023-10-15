@@ -24,10 +24,8 @@ export async function applyViteDevMiddlewares(
   app.use(vite.middlewares);
 
   app.use('*', async (req, res) => {
-    console.log(req.url);
     try {
       const url = req.originalUrl;
-      console.log(req.url);
 
       const html = fs.readFileSync(path.resolve(cwd, 'index.html'), 'utf-8');
 
@@ -38,7 +36,7 @@ export async function applyViteDevMiddlewares(
     } catch (e) {
       if (e instanceof Error) {
         vite && vite.ssrFixStacktrace(e);
-        console.log(e.stack);
+        console.warn(e, e.stack);
         res.status(500).end(e.stack);
       }
     }
