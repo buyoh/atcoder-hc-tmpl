@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RESTApiClient } from '../../libs/RESTApiClient';
-import { IJob, ITask } from '../../../interface/Web';
+import { IJob, ITask, ITestCase, ITestCaseGroup } from '../../../interface/Web';
 
 export interface AppState {
-  testcases: { path: string; title: string }[];
+  testcases: ITestCase[];  // TODO: Rename to testCases
+  testCaseGroups: ITestCaseGroup[];
   jobs: IJob[];
   selectedJobId: string | null;
   tasksOfSelectedJobs: ITask[];
@@ -11,6 +12,7 @@ export interface AppState {
 
 const kInitialAppState: AppState = {
   testcases: [],
+  testCaseGroups: [],
   jobs: [],
   selectedJobId: null,
   tasksOfSelectedJobs: [],
@@ -18,12 +20,24 @@ const kInitialAppState: AppState = {
 
 // ------------------------------------
 
-export const updateHistoryAsync = createAsyncThunk(
+// TODO: Rename to load
+export const updateTestCasesAsync = createAsyncThunk(
   'app/testcase/Update',
   async () => {
-    const testcases = await RESTApiClient.getAllTestcasesList();
+    const testcases = await RESTApiClient.getAllTestCases();
+    testcases.sort((l, r) => l.path.localeCompare(r.path));
     return {
       testcases,
+    };
+  }
+);
+
+export const updateTestCaseGroupsAsync = createAsyncThunk(
+  'app/testcasegroup/Update',
+  async () => {
+    const testCaseGroups = await RESTApiClient.getAllTestCaseGroups();
+    return {
+      testCaseGroups,
     };
   }
 );
@@ -74,8 +88,11 @@ const appSlice = createSlice({
   // --------------
 
   extraReducers(builder) {
-    builder.addCase(updateHistoryAsync.fulfilled, (state, action) => {
+    builder.addCase(updateTestCasesAsync.fulfilled, (state, action) => {
       state.testcases = action.payload.testcases;
+    });
+    builder.addCase(updateTestCaseGroupsAsync.fulfilled, (state, action) => {
+      state.testCaseGroups = action.payload.testCaseGroups;
     });
     builder.addCase(updateJobListAsync.fulfilled, (state, action) => {
       state.jobs = action.payload.jobs;

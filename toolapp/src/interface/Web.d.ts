@@ -1,6 +1,17 @@
-export interface ITestcaseInfo {
+export interface ITestcaseInfo {  // Obsolate
   path: string;
   title: string;
+}
+
+export interface ITestCaseGroup {
+  id: string;
+  title: string;
+  // testcases: ITestcaseInfo[];
+}
+
+export interface ITestCase {
+  id: string;
+  path: string;
 }
 
 export type ITaskStatus =
@@ -26,17 +37,32 @@ export interface IJob {
 
 // HTTP/REST API の抽象化
 export interface IRequestHandler {
-  // GET /api/testcase
   // TODO: Consider fail case
-  getAllTestcasesList(): Promise<ITestcaseInfo[]>;
   // POST //api/exec/start
   startSolution(): Promise<void>;
 
-  // TODO:
   // GET //api/job
   getAllJobs(): Promise<IJob[]>;
   // GET //api/job/:id
   getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[] } | null>;
+
+  // GET /api/testcase
+  getAllTestCases(): Promise<ITestCase[]>;
+
+  // GET //api/testcasegroup
+  getAllTestCaseGroups(): Promise<ITestCaseGroup[]>;
+  // GET //api/testcasegroup/:id
+  getTestCaseGroup(
+    id: string
+  ): Promise<{ testCases: ITestCase[] } | null>;
+  // POST //api/testcasegroup
+  createTestCaseGroup(title: string): Promise<ITestCaseGroup>;
+  // POST //api/testcasegroup/:id/testcase
+  // body: {testcaseIds: string[]}
+  addTestCasesToTestCaseGroup(
+    testCaseGroupId: string,
+    testCaseIds: string[]
+  ): Promise<void>;
 }
 
 // websocket API の抽象化

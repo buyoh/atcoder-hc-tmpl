@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { ReduxStoreState, ReduxStoreDispatch } from '../stores/stores';
-import { updateHistoryAsync } from '../stores/App/slices';
+import { updateTestCasesAsync } from '../stores/App/slices';
 
 // ------------------------------------
 
@@ -14,22 +14,23 @@ type StateProps = {
 };
 
 type DispatchProps = {
-  updateHistory: () => void;
 };
 
 type CombinedProps = Props & StateProps & DispatchProps;
 
 function mapStateToProps(state: ReduxStoreState): StateProps {
   return {
-    testcases: state.app.testcases,
+    testcases: state.app.testcases.map((testcase) => {
+      return {
+        path: testcase.path,
+        title: testcase.path,
+      };
+    }),
   };
 }
 
 function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
   return {
-    updateHistory: () => {
-      dispatch(updateHistoryAsync());
-    },
   };
 }
 

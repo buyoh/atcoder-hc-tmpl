@@ -1,12 +1,25 @@
 import { DataSource } from 'typeorm';
 import { Job as EJob, Task as ETask } from './entity/JobTask';
+import {
+  TestCase as ETestCase,
+  TestCaseGroup as ETestCaseGroup,
+  TestCaseGroupTestCase as TestCaseGroupTestCase,
+} from './entity/TestCase';
+
+const kAllEntities = [
+  EJob,
+  ETask,
+  ETestCase,
+  ETestCaseGroup,
+  TestCaseGroupTestCase,
+];
 
 function createDataSourceSqlite(): DataSource {
   const dataSource = new DataSource({
     type: 'sqlite',
     // database: ':memory:',
     database: 'db.sqlite3',
-    entities: [EJob, ETask],
+    entities: kAllEntities,
     synchronize: true,
     logging: false,
   });
@@ -22,7 +35,7 @@ function createDataSourceSqlite(): DataSource {
 //     password: config.postgres?.password || 'postgres',
 //     database: config.postgres?.database || 'mai-hc-toolapp',
 
-//     entities: [EJob, ETask],
+//     entities: kAllEntities,
 //     synchronize: true, // test only
 //     // dropSchema: true, // test only
 //     logging: false,

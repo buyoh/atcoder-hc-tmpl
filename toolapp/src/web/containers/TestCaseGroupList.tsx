@@ -10,24 +10,28 @@ type Props = {};
 type State = {};
 
 type StateProps = {
-  // testcases: { path: string; title: string }[];
+  testCaseGroups: { id: string }[];
 };
 
 type DispatchProps = {
-  updateHistory: () => void;
+  loadTestCaseGroups: () => void;
 };
 
 type CombinedProps = Props & StateProps & DispatchProps;
 
 function mapStateToProps(state: ReduxStoreState): StateProps {
   return {
-    // testcases: state.app.testcases,
+    testCaseGroups: state.app.testCaseGroups.map((testCaseGroup) => {
+      return {
+        id: testCaseGroup.id,
+      };
+    }),
   };
 }
 
 function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
   return {
-    updateHistory: () => {
+    loadTestCaseGroups: () => {
       dispatch(updateTestCasesAsync());
     },
   };
@@ -35,20 +39,41 @@ function mapDispatchToProps(dispatch: ReduxStoreDispatch): DispatchProps {
 
 // ------------------------------------
 
-class ObserverTestCase extends React.Component<CombinedProps, State> {
+class TestCaseGroupList extends React.Component<CombinedProps, State> {
+
+  timer = -1;
+
   constructor(props: CombinedProps) {
     super(props);
     this.state = {};
-    // TODO: Update history if needed
   }
 
   componentDidMount(): void {
-    // First load
-    this.props.updateHistory();
+    this.props.loadTestCaseGroups();
+    this.timer = window.setInterval(() => {
+      this.props.loadTestCaseGroups();
+    }, 2000);
+  }
+
+  componentWillUnmount(): void {
+    if (this.timer !== -1) {
+      window.clearInterval(this.timer);
+      this.timer = -1;
+    }
   }
 
   render(): JSX.Element {
-    return <></>;
+    return (
+      <ul className="menu bg-base-200 w-56 rounded-box">
+        {this.props.testCaseGroups.map((testCaseGroup) => {
+          return (
+            <li key={testCaseGroup.id}>
+              <a>{testCaseGroup.id}</a>
+            </li>
+          );
+        })}
+      </ul>
+    );
   }
 }
 
@@ -57,4 +82,4 @@ class ObserverTestCase extends React.Component<CombinedProps, State> {
 export default connect<StateProps, DispatchProps, Props, ReduxStoreState>(
   mapStateToProps,
   mapDispatchToProps
-)(ObserverTestCase);
+)(TestCaseGroupList);

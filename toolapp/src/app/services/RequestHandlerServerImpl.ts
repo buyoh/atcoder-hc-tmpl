@@ -2,6 +2,8 @@ import {
   IJob,
   IRequestHandler,
   ITask,
+  ITestCase,
+  ITestCaseGroup,
   ITestcaseInfo,
 } from '../../interface/Web';
 import { DatabaseService } from './DatabaseService';
@@ -23,20 +25,16 @@ export class RequestHandlerServerImpl implements IRequestHandler {
     this.jobManager = jobManager;
   }
 
-  async getAllTestcasesList(): Promise<ITestcaseInfo[]> {
-    const filePaths = this.inputFileListManager.paths();
-    return filePaths.map((filePath) => ({
-      path: filePath,
-      title: filePath,
-    }));
-  }
   async startSolution(): Promise<void> {
     this.jobManager.addJob([0, 1, 2]);
   }
 
   async getAllJobs(): Promise<IJob[]> {
     const jobs = await this.databaseService.getAllJobs();
-    return jobs.map((job) => ({ id: job.id, createdAtISO: job.createdAt.toISOString() }));
+    return jobs.map((job) => ({
+      id: job.id,
+      createdAtISO: job.createdAt.toISOString(),
+    }));
   }
 
   async getJob(jobId: string): Promise<{ job: IJob; tasks: ITask[] } | null> {
@@ -59,5 +57,55 @@ export class RequestHandlerServerImpl implements IRequestHandler {
         score: task.score,
       })),
     };
+  }
+
+  async getAllTestCases(): Promise<ITestCase[]> {
+    const testCases = await this.databaseService.getAllTestCase();
+    return testCases.map((testCase) => ({
+      id: testCase.id,
+      path: testCase.filePath,
+    }));
+  }
+
+  async getAllTestCaseGroups(): Promise<ITestCaseGroup[]> {
+    const testCaseGroups = await this.databaseService.getAllTestCaseGroups();
+    return testCaseGroups.map((testCaseGroup) => ({
+      id: testCaseGroup.id,
+      title: testCaseGroup.title,
+    }));
+  }
+
+  async getTestCaseGroup(
+    id: string
+  ): Promise<{ testCases: ITestCase[] } | null> {
+    const mayTestCases = await this.databaseService.getTestCaseGroup(id);
+    if (!mayTestCases) {
+      return null;
+    }
+    const { testCases } = mayTestCases;
+    return {
+      testCases: testCases.map((testCase) => ({
+        id: testCase.id,
+        path: testCase.filePath,
+      })),
+    };
+  }
+
+  async createTestCaseGroup(title: string): Promise<ITestCaseGroup> {
+    const testCaseGroup = await this.databaseService.createTestCaseGroup(title);
+    return {
+      id: testCaseGroup.id,
+      title: testCaseGroup.title,
+    };
+  }
+
+  async addTestCasesToTestCaseGroup(
+    testCaseGroupId: string,
+    testCaseIds: string[]
+  ): Promise<void> {
+    await this.databaseService.addTestCasesToTestCaseGroup(
+      testCaseGroupId,
+      testCaseIds
+    );
   }
 }

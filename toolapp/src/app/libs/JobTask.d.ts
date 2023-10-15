@@ -17,7 +17,20 @@ export type TaskState = {
   score: number;
   error: string | null;
 };
+
 export type Job = {
   id: string;
   createdAt: Date;
+};
+
+export type TestCase = {
+  id: string;
+  filePath: string;
+  available: boolean;
+};
+
+export type TestCaseGroup = {
+  id: string;
+  title: string;
+  type: number;  // TODO: enum. always 0
 };

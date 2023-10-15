@@ -5,6 +5,7 @@ import { RESTApiClient } from '../libs/RESTApiClient';
 import ObserveJobList from '../containers/ObserveJobList';
 import JobList from '../containers/JobList';
 import TaskList from '../containers/TaskList';
+import TestCaseGroupList from '../containers/TestCaseGroupList';
 
 // TODO:
 async function handleTestRunClick() {
@@ -30,6 +31,9 @@ export function PageIndex(props: {}): JSX.Element {
               test run
             </button>
           </div>
+          {/* <div className="flex-none overflow-y-scroll">
+            <TestCaseGroupList />
+          </div> */}
           <div className="flex-none overflow-y-scroll">
             <TestCaseList />
           </div>

@@ -30,6 +30,9 @@ console.log('working directory: ', solutionCwd);
 
   const databaseService = createDatabaseService();
   await databaseService.initialize();
+
+  databaseService.syncTestCases(inputFileListManager.paths());
+
   const jobManager = new JobManager(
     inputFileListManager,
     solutionCwd,
@@ -45,6 +48,7 @@ console.log('working directory: ', solutionCwd);
 
   const app = express();
   await applyWebSocketMiddleware(app, connFactory);
+  app.use(express.json());
   await applyRESTMiddleWare(app, requestHandler);
   if (useViteServer)
     await applyViteDevMiddlewares(app, cwd);
