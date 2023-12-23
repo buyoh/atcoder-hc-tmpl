@@ -71,8 +71,7 @@ for FILE in `cat $FILE_LIST`; do
   FILE_SCORE="out/cases_out/$FILE.score.txt"
   $LOGGING $FILE
 
-  cat $FILE_STDERR > $FILE_SCORE
-  # ./third_party/tools/target/release/qvis $FILE_STDIN $FILE_STDOUT > $FILE_SCORE &
+  bash bin/score.sh $FILE_STDIN $FILE_STDOUT $FILE_STDERR out/$ID.vis.html > $FILE_SCORE &
   
   TOTAL_P=$(($TOTAL_P+1))
   if [[ $NUM_PARALLEL -le $TOTAL_P ]]; then
@@ -90,12 +89,8 @@ for FILE in `cat $FILE_LIST`; do
   FILE_STDERR="out/cases_out/$FILE.err.txt"
   FILE_SCORE="out/cases_out/$FILE.score.txt"
 
-  # if CALC_SCORE_MYSELF; then
-  SCORE=`tail $FILE_STDERR -n1 | tr -cd "^0-9"`
-  # else
-  # SCORE=`cat $FILE_SCORE | tail -n1 | tr -cd "^0-9"`
-  # mv vis.html out/cases_out/$FILE.vis.html
-  # fi
+  SCORE=`cat $FILE_SCORE | tail -n1 | tr -cd "^0-9"`
+
   $LOGGING_F "case %12s: score=%15.2f\n" $FILE $SCORE
   TOTAL_SCORE=$(($TOTAL_SCORE+$SCORE))
 done
