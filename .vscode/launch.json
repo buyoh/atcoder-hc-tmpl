@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/out/main",
-      "args": [ "<", "${workspaceFolder}/stdin/1.txt" ],
+      "args": [ "<", "${workspaceFolder}/stdin/in_000000.txt" ],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

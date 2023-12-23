@@ -50,8 +50,8 @@ fi
 
 ./generate_testcases.sh 100
 rm stdin/* ||:
-cp out/cases/in_0.txt stdin
-cp out/cases/in_1.txt stdin
-cp out/cases/in_2.txt stdin
+ls out/cases/ | head -n3 | xargs -I{} cp out/cases/{} stdin
+mkdir -p analysis/input
+(cd out/cases && ls) > analysis/input/_all.txt
 
 echo "complete!"
