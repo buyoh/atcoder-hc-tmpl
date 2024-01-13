@@ -71,7 +71,7 @@ for FILE in `cat $FILE_LIST`; do
   FILE_SCORE="out/cases_out/$FILE.score.txt"
   $LOGGING $FILE
 
-  bash bin/score.sh $FILE_STDIN $FILE_STDOUT $FILE_STDERR out/$ID.vis.html > $FILE_SCORE &
+  bash bin/score.sh $FILE_STDIN $FILE_STDOUT $FILE_STDERR out/$FILE.vis.html > $FILE_SCORE &
   
   TOTAL_P=$(($TOTAL_P+1))
   if [[ $NUM_PARALLEL -le $TOTAL_P ]]; then
