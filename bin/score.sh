@@ -16,7 +16,7 @@ fi
 # if CALC_SCORE_MYSELF; then
 # tail -n1 $FILE_STDERR
 # else
-./third_party/tools/target/release/vis $FILE_STDIN $FILE_STDOUT
+./third_party/tools/target/release/vis $FILE_STDIN $FILE_STDOUT 2>&1
 #cat vis.html src/vistool.html > $FILE_VIS # out/$ID.vis.html
 #rm vis.html
 mv vis.html $FILE_VIS
