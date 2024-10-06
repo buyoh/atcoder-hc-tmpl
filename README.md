@@ -71,6 +71,9 @@ workspace for heuristic contest
   - stdin ディレクトリに配置されたテストケースを順に実行する。
 - run_with_profile.sh
   - 未使用
+- setup_atcoder.sh url
+  - AtCoder で配布されている rust 製テストツールの URL を指定すると、フェッチしてダウンロード、テストケースの構築までやる
+  - URL を指定しない場合、既にリポジトリ上にテストツールが構築されている前提で、テストツールのビルドを行う
 
 # sample problem
 

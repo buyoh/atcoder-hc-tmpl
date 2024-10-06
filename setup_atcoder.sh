@@ -1,37 +1,43 @@
 #!/bin/bash
 
-set -eu
 cd `dirname $0`
 
 A_URL=$1
 
+set -eu
+
 [[ -e third_party_tmp ]] && echo "third_party_tmp exists. abort!" && exit 1
 
-mkdir third_party_tmp
-pushd third_party_tmp > /dev/null
+if [[ -n $A_URL ]]; then
 
-wget $A_URL
-ZIP_FILENAME=`ls`
+  mkdir third_party_tmp
+  pushd third_party_tmp > /dev/null
 
-unzip $ZIP_FILENAME
-rm $ZIP_FILENAME
-TOOL_NAME=`ls`
-echo $TOOL_NAME
-TOOL_NAME=`readlink -f $TOOL_NAME`
+  wget $A_URL
+  ZIP_FILENAME=`ls`
 
-popd > /dev/null
+  unzip $ZIP_FILENAME
+  rm $ZIP_FILENAME
+  TOOL_NAME=`ls`
+  echo $TOOL_NAME
+  TOOL_NAME=`readlink -f $TOOL_NAME`
 
-mkdir -p third_party
+  popd > /dev/null
 
-pushd third_party > /dev/null
+  mkdir -p third_party
 
-mv $TOOL_NAME .
-TOOL_NAME=`basename $TOOL_NAME`
-echo "$TOOL_NAME/target" >> .gitignore
-echo "$TOOL_NAME/in" >> .gitignore
+  pushd third_party > /dev/null
 
-popd > /dev/null
-rm -rf third_party_tmp
+  mv $TOOL_NAME .
+  TOOL_NAME=`basename $TOOL_NAME`
+  echo "$TOOL_NAME/target" >> .gitignore
+  echo "$TOOL_NAME/in" >> .gitignore
+
+  popd > /dev/null
+  rm -rf third_party_tmp
+else
+  TOOL_NAME=tools
+fi
 
 echo "Suppose that it's traditional AtCoder tools and try to build" # but we will not build :(
 
