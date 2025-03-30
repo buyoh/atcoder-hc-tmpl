@@ -136,6 +136,7 @@ struct P {
   inline P() : y(0), x(0) {}
 
   inline bool operator==(P p) const { return y == p.y && x == p.x; }
+  inline bool operator!=(P p) const { return y != p.y || x != p.x; }
   inline bool operator<(P p) const { return y == p.y ? x < p.x : y < p.y; }
   inline P operator+(P p) const { return P(y + p.y, x + p.x); }
   inline P operator-(P p) const { return P(y - p.y, x - p.x); }
