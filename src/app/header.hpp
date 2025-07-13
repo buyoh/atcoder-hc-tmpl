@@ -132,14 +132,14 @@ struct P {
   using T = int;
   T y, x;
 
-  inline explicit P(T _y, T _x) : y(_y), x(_x) {}
-  inline P() : y(0), x(0) {}
+  constexpr inline explicit P(T _y, T _x) : y(_y), x(_x) {}
+  constexpr inline P() : y(0), x(0) {}
 
-  inline bool operator==(P p) const { return y == p.y && x == p.x; }
-  inline bool operator!=(P p) const { return y != p.y || x != p.x; }
-  inline bool operator<(P p) const { return y == p.y ? x < p.x : y < p.y; }
-  inline P operator+(P p) const { return P(y + p.y, x + p.x); }
-  inline P operator-(P p) const { return P(y - p.y, x - p.x); }
+  constexpr inline bool operator==(P p) const { return y == p.y && x == p.x; }
+  constexpr inline bool operator!=(P p) const { return y != p.y || x != p.x; }
+  constexpr inline bool operator<(P p) const { return y == p.y ? x < p.x : y < p.y; }
+  constexpr inline P operator+(P p) const { return P(y + p.y, x + p.x); }
+  constexpr inline P operator-(P p) const { return P(y - p.y, x - p.x); }
   inline P &operator+=(P p) {
     y += p.y;
     x += p.x;
