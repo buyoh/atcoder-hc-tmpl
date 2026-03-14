@@ -4,11 +4,11 @@
 
 ## ドキュメント
 
-AI 向けのドキュメントは `ai-docs/` ディレクトリにある
+AI 向けのドキュメントは `docs-ai/` ディレクトリにある
 
 - src/problem.md : 問題文
-- ai-docs/tasks.md: 開発タスク一覧と進捗管理
-- ai-docs/plan.md: プロジェクト設計書
+- docs-ai/tasks.md: 開発タスク一覧と進捗管理
+- docs-ai/plan.md: プロジェクト設計書
 
 ## コマンド
 
@@ -22,7 +22,7 @@ AI 向けのドキュメントは `ai-docs/` ディレクトリにある
 
 ## Git について
 
-コミットには以下のアカウントを設定してください。push は行わない。
+コミットには以下のアカウントを設定してください
 
-- name: buyoh(agent)
+- name: buyoh
 - email: 15198247+buyoh@users.noreply.github.com
